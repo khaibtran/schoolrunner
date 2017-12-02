@@ -4,11 +4,11 @@ from requests.auth import HTTPBasicAuth
 
 today = date.today().strftime("%Y-%m-%d")
 
-network = 'crescentcity'
+network = 
 
-user = 'habans.api@crescentcityschools.org'
+user = 
 
-pw = 'Mamba2017'
+pw = 
 
 def getMissingAttendance(courses, params):
 
