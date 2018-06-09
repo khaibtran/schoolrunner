@@ -1,16 +1,22 @@
 import requests
+import login
 from datetime import date
 from requests.auth import HTTPBasicAuth
 
-today = date.today().strftime("%Y-%m-%d")
-
-network = 
-
-user = 
-
-pw = 
 
 def getMissingAttendance(courses, params):
+    
+    today = date.today().strftime("%Y-%m-%d")
+
+    user = login.user
+
+    pw = login.pw
+
+    network = login.network
+
+    courses_missing = {}
+
+    courses_not_taken = {}
 
     # Make the GET request and store the results in a variable called response
     endpoint = 'class-absence-totals'
@@ -36,6 +42,7 @@ def getMissingAttendance(courses, params):
         if j['section_period_id'] in courses:
             courses[j['section_period_id']]['enrolled'] = j['enrolled_students']
         else:
+            #If section_period_id not found in courses
             courses[j['section_period_id']] = {'name': ('WRONG SECTION - ' + j['section_period_id']), 'enrolled': j['enrolled_students'], 'marked': 0}
 
 
@@ -68,8 +75,20 @@ def getMissingAttendance(courses, params):
 
     for c, c_info in sorted(courses.iteritems()):
         if c_info['marked'] < int(c_info['enrolled']):
-            print(' MISSING '.center(30, '*') +'\n*' + ((c_info['name'].rjust(14, ' ') + ' ' + str(c_info['marked']) + '/' + c_info['enrolled'])).ljust(28, ' ') + '*\n' + ' '.rjust(31, '*'))
+            courses_missing[c] = c_info
         elif c_info['marked'] == 0:
-            print(' NOT TAKEN '.center(30, '#') +'\n#' + ((c_info['name'].rjust(14, ' ') + ' ' + str(c_info['marked']) + '/' + c_info['enrolled'])).ljust(28, ' ') + '#\n' + ' '.rjust(31, '#'))
+            courses_not_taken[c] = c_info
         else :
-            print(c_info['name'].rjust(15, ' ') + ' ' + str(c_info['marked']) + '/' + c_info['enrolled'])
+            print(c_info['name'].rjust(15, ' ') + ' ' + str(c_info['marked']) + '/' + str(c_info['enrolled']))
+
+    if courses_not_taken:
+        print(' NOT TAKEN '.center(30, '#'))
+        for n, n_info in sorted(courses_not_taken.iteritems()):
+            print('#' + ((n_info['name'].rjust(14, ' ') + ' ' + str(n_info['marked']) + '/' + str(n_info['enrolled']))).ljust(28, ' ') + '#')
+        print(' '.rjust(31, '#'))
+
+    if courses_missing:
+        print(' MISSING '.center(30, '*'))
+        for m, m_info in sorted(courses_missing.iteritems()):
+            print('*' + ((m_info['name'].rjust(14, ' ') + ' ' + str(m_info['marked']) + '/' + m_info['enrolled'])).ljust(28, ' ') + '*')
+        print(' '.rjust(31, '*'))
